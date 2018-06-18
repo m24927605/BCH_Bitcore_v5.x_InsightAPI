@@ -20,6 +20,8 @@ Step3
 ```
 sudo apt-get install libzmq3-dev build-essential
 git clone -b v5.x https://github.com/bitpay/bitcore.git
+cd bitcore
+npm install
 ```
 Step4
 //bitcore create bitcoin cash project
