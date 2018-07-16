@@ -23,16 +23,21 @@ cd ~ && touch bitcoin.conf
 vi bitcoin.conf
 datadir=/home/[user]/bch_data
 server=1
+whitebind=127.0.0.1:8333
 whitelist=127.0.0.1
 txindex=1
 addressindex=1
 timestampindex=1
 spentindex=1
+reindex=1
 zmqpubrawtx=tcp://127.0.0.1:28332
-zmqpubhashblock=tcp://127.0.0.1:28332
+zmqpubhashtx=tcp://127.0.0.1:28333
+zmqpubhashblock=tcp://127.0.0.1:28334
+zmqpubrawblock=tcp://127.0.0.1:28335
 rpcallowip=127.0.0.1
-rpcuser=bch
-rpcpassword=Aa123456
+rpcport=8332
+rpcuser=bchcoolbitxbch
+rpcpassword=coolbitxbchcoolbitx
 uacomment=bitcore
 daemon=1
 ```
@@ -47,68 +52,83 @@ Step5
 //Install bitcore locally
 ```
 cd ~
-git clone -b v5.x https://github.com/bitpay/bitcore.git
-cd bitcore
+git clone https://github.com/bitpay/bitcore-node.git
+cd bitcore-node
 ```
 Step6  
 //change package.json
 ```
 {
-  "name": "bitcore",
-  "version": "5.0.0-beta.44",
-  "description": "A platform to build bitcoin and blockchain-based applications.",
+  "name": "bitcore-node",
+  "description": "Full node with extended capabilities using Bitcore and Bitcoin Core",
   "engines": {
     "node": ">=8.0.0"
   },
   "author": "BitPay <dev@bitpay.com>",
-  "main": "index.js",
-  "scripts": {
-    "test": "./node_modules/.bin/mocha test/** --recursive",
-    "build-deb": "./scripts/build-deb"
+  "version": "5.0.0-beta.44",
+  "main": "./index.js",
+  "repository": "git://github.com/bitpay/bitcore-node.git",
+  "homepage": "https://github.com/bitpay/bitcore-node",
+  "bugs": {
+    "url": "https://github.com/bitpay/bitcore-node/issues"
   },
   "bin": {
-    "bitcore": "./bin/bitcore",
-    "bitcored": "./bin/bitcored"
+    "bitcore-node": "./bin/bitcore-node"
   },
-  "keywords": [
+  "scripts": {
+    "test": "NODE_ENV=test mocha -R spec --recursive test"
+  },
+  "tags": [
     "bitcoin",
-    "transaction",
-    "address",
-    "p2p",
-    "ecies",
-    "cryptocurrency",
-    "blockchain",
-    "payment",
-    "bip21",
-    "bip32",
-    "bip37",
-    "bip69",
-    "bip70",
-    "multisig"
+    "bitcoind",
+    "bcoin",
+    "bitcoin full node",
+    "bitcoin index",
+    "block explorer",
+    "wallet backend"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bitpay/bitcore.git"
-  },
   "dependencies": {
+    "async": "^2.5.0",
+    "bcoin": "bitpay/bcoin#v1.0.0-beta.14+cash",
+    "bitcoind-rpc": "^0.6.0",
     "bitcore-lib": "5.0.0-beta.1",
-    "bitcore-lib-cash": "bitpay/bitcore-lib-cash",
-    "bitcore-p2p": "bitpay/bitcore-p2p",
-    "bitcore-p2p-cash": "bitpay/bitcore-p2p-cash",
-    "bitcore-node": "5.0.0-beta.44",
+    "bitcore-p2p": "5.0.0-beta.1",
     "insight-api": "5.0.0-beta.44",
-    "insight-ui": "bitpay/insight#v5.0.0-beta.44"
+    "bn.js": "^4.11.8",
+    "body-parser": "^1.13.3",
+    "colors": "^1.1.2",
+    "commander": "^2.8.1",
+    "errno": "^0.1.4",
+    "express": "^4.13.3",
+    "leveldown": "^2.0.0",
+    "levelup": "^2.0.0",
+    "liftoff": "^2.2.0",
+    "lodash": "^4.17.4",
+    "lru-cache": "^4.1.1",
+    "memwatch-next": "^0.3.0",
+    "mkdirp": "0.5.0",
+    "path-is-absolute": "^1.0.0",
+    "socket.io": "^1.4.5",
+    "socket.io-client": "^1.4.5",
+    "xxhash": "^0.2.4"
   },
-  "license": "MIT",
   "devDependencies": {
-    "chai": "^3.3.0",
-    "mocha": "^2.3.3"
-  }
+    "chai": "^3.5.0",
+    "coveralls": "^2.11.9",
+    "istanbul": "^0.4.3",
+    "jshint": "^2.9.2",
+    "jshint-stylish": "^2.1.0",
+    "mocha": "3.2.0",
+    "proxyquire": "^1.3.1",
+    "rimraf": "^2.4.2",
+    "sinon": "^1.15.4"
+  },
+  "license": "MIT"
 }
 ```
 
 Step7  
-//install the library in bitcore folder  
+//install the library
 ```
 cd ~/bitcore
 npm install
@@ -118,7 +138,7 @@ npm install
 Step8  
 //create and edit bitcode-node.json
 ```
-cd ~/bitcore && touch bitcore-node.json
+cd ~/bitcore-node && touch bitcore-node.json
 vi bitcore-node.json
 
 {
@@ -145,16 +165,25 @@ vi bitcore-node.json
     },
     "p2p": {
       "peers": [
-        { "ip": { "v4": "127.0.0.1" } }
+        {
+          "ip": {
+            "v4": "127.0.0.1"
+          },
+          "port": 8333
+        }
       ]
     },
     "fee": {
       "rpc": {
-        "user": "bch",
-        "pass": "Aa123456",
+        "user": "bchcoolbitxbch",
+        "pass": "coolbitxbchcoolbitx",
         "host": "localhost",
         "protocol": "http",
-        "port": 8332
+        "port": 8332,
+        "zmqpubrawtx":"tcp://127.0.0.1:28332",
+        "zmqpubhashtx":"tcp://127.0.0.1:28333",
+        "zmqpubhashblock":"tcp://127.0.0.1:28334",
+        "zmqpubrawblock":"tcp://127.0.0.1:28335"
       }
     }
   }
@@ -174,7 +203,7 @@ vi bitcore-node.json
 //Part bitcore-lib  
 //**please change the networkMagic's value to 0xe3e1f3e8**
 ```
-cd ~/bitcore/node_modules/bitcore-lib/lib  
+cd ~/bitcore-node/node_modules/bitcore-lib/lib  
 vi networks.js 
 
 addNetwork({
@@ -212,13 +241,13 @@ pm2 save
 //if you install pm2 please choose step7.1 to run the bitcoin-cash server.
 Step 11.1
 ```
-cd ~/bitcore
-pm2 start ./bin/bitcored -- start
+cd ~/bitcore-node
+pm2 start ./bin/bitcore-node -- start
 ```
 //if you didin't install pm2,please choose step7.2 to run the bitcoin-cash server.
 Step11.2
 ```
-cd ~/bitcore
-./bin/bitcored start
+cd ~/bitcore-node
+./bin/bitcore-node start
 ```
 //////Done!!!!///////
