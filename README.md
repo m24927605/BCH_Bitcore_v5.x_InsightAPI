@@ -36,8 +36,8 @@ zmqpubhashblock=tcp://127.0.0.1:28334
 zmqpubrawblock=tcp://127.0.0.1:28335
 rpcallowip=127.0.0.1
 rpcport=8332
-rpcuser=bchcoolbitxbch
-rpcpassword=coolbitxbchcoolbitx
+rpcuser=[rpcuser]
+rpcpassword=[rpcpassword]
 uacomment=bitcore
 daemon=1
 ```
@@ -175,8 +175,8 @@ vi bitcore-node.json
     },
     "fee": {
       "rpc": {
-        "user": "bchcoolbitxbch",
-        "pass": "coolbitxbchcoolbitx",
+        "user": [rpcuser],
+        "pass": [rpcpassword],
         "host": "localhost",
         "protocol": "http",
         "port": 8332,
@@ -193,7 +193,7 @@ vi bitcore-node.json
 //This is very important step to fix the bitcore's bug.  
 //the bitcore-lib and bitcoinABC's version is not match,it will happen some configure problem like network(p2p).
 
-//Part bitcoinABC     https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
+//BitcoinABC livenet part     https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
 //Please find the netMagic class CMainParams  
   netMagic[0] = 0xe3;  
   netMagic[1] = 0xe1;  
@@ -226,6 +226,51 @@ addNetwork({
   ]
 }); 
 ```
+//BitcoinABC testnet part     https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
+//Please find the netMagic class CMainParams  
+  netMagic[0] = 0xf4;  
+  netMagic[1] = 0xe5;  
+  netMagic[2] = 0xf3;  
+  netMagic[3] = 0xf4;  
+
+//Part bitcore-lib  
+//**please change the networkMagic's value to 0xf4e5f3f4**
+```
+cd ~/bitcore-node/node_modules/bitcore-lib/lib  
+vi networks.js 
+
+var TESTNET = {
+  PORT: 18333,
+  NETWORK_MAGIC: BufferUtil.integerAsBuffer(0xf4e5f3f4),
+  DNS_SEEDS: [
+    'testnet-seed.bitcoin.petertodd.org',
+    'testnet-seed.bluematt.me',
+    'testnet-seed.alexykot.me',
+    'testnet-seed.bitcoin.schildbach.de'
+  ]
+};
+```
+
+//BitcoinABC regtestnet part     https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
+//Please find the netMagic class CMainParams  
+  netMagic[0] = 0xda;  
+  netMagic[1] = 0xb5;  
+  netMagic[2] = 0xbf;  
+  netMagic[3] = 0xfa;  
+
+//Part bitcore-lib  
+//**please change the networkMagic's value to 0xdab5bffa**
+```
+cd ~/bitcore-node/node_modules/bitcore-lib/lib  
+vi networks.js 
+
+var REGTEST = {
+  PORT: 18444,
+  NETWORK_MAGIC: BufferUtil.integerAsBuffer(0xdab5bffa),
+  DNS_SEEDS: []
+};
+```
+
 Step10(options)
 //Install pm2
 ```
