@@ -1,14 +1,14 @@
 Ubuntu OS
 
 Step1  
-//Install node.js,the node .js version is v8.11.3. and npm version 5.6.0
+> Install node.js,the node .js version is v8.11.3. and npm version 5.6.0
 ```
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```  
 
 Step2  
-//Install bitcoinABC's bitcoind (version is 0.17.2)
+> Install bitcoinABC's bitcoind (version is 0.17.2)
 ``` 
 sudo apt-get install software-properties-common
 sudo add-apt-repository ppa:bitcoin-abc/ppa
@@ -17,7 +17,7 @@ sudo apt-get install bitcoind
 sudo apt-get install libzmq3-dev build-essential
 ```  
 Step3  
-//create bitcoin.conf for bitcoinABC's bitcoind  
+> create bitcoin.conf for bitcoinABC's bitcoind  
 ```
 cd ~ && touch bitcoin.conf
 vi bitcoin.conf
@@ -41,22 +41,23 @@ rpcpassword=[rpcpassword]
 uacomment=bitcore
 daemon=1
 ```
+
 Step4  
-//launch bitcoind and you will see the response "Bitcoin is starting" in terminal then check the debug.log in bch_data folder.
+> launch bitcoind and you will see the response "Bitcoin is starting" in terminal then check the debug.log in bch_data folder.
 ```
 cd ~
 bitcoind -conf=/home/[user]/bitcoin.conf
 ```
 
 Step5  
-//Install bitcore locally
+> Install bitcore locally
 ```
 cd ~
 git clone https://github.com/bitpay/bitcore-node.git
 cd bitcore-node
 ```
 Step6  
-//change package.json
+> change package.json
 ```
 {
   "name": "bitcore-node",
@@ -128,7 +129,7 @@ Step6
 ```
 
 Step7  
-//install the library
+> install the library
 ```
 cd ~/bitcore
 npm install
@@ -136,7 +137,7 @@ npm install
 
 
 Step8  
-//create and edit bitcode-node.json
+> create and edit bitcode-node.json
 ```
 cd ~/bitcore-node && touch bitcore-node.json
 vi bitcore-node.json
@@ -189,23 +190,26 @@ vi bitcore-node.json
   }
 }
 ```
-**Step9 WATCH OUT THIS!!!!**  
-//This is very important step to fix the bitcore's bug.  
-//the bitcore-lib and bitcoinABC's version is not match,it will happen some configure problem like network(p2p).
+**Step9 NOTICE THIS!!!!**  
+> This is very important step to fix the bitcore-node's bug.  
+the bitcore-lib and bitcoinABC's version is not match,it will happen some configure problem like network(p2p).
 
-//BitcoinABC livenet part     https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
-//Please find the netMagic class CMainParams  
+> **BitcoinABC livenet part**      
+https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
+Please find the netMagic class CMainParams  
+...  
   netMagic[0] = 0xe3;  
   netMagic[1] = 0xe1;  
   netMagic[2] = 0xf3;  
   netMagic[3] = 0xe8;  
+...  
 
-//Part bitcore-lib  
-//**please change the networkMagic's value to 0xe3e1f3e8**
+> bitcore-lib part   
+**please change the networkMagic's value to 0xe3e1f3e8**  
 ```
 cd ~/bitcore-node/node_modules/bitcore-lib/lib  
 vi networks.js 
-
+...  
 addNetwork({
   name: 'livenet',
   alias: 'mainnet',
@@ -225,20 +229,24 @@ addNetwork({
     'bitseed.xf2.org'
   ]
 }); 
+...  
 ```
-//BitcoinABC testnet part     https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
-//Please find the netMagic class CMainParams  
+> **BitcoinABC testnet part**     
+https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
+Please find the netMagic class CMainParams  
+...  
   netMagic[0] = 0xf4;  
   netMagic[1] = 0xe5;  
   netMagic[2] = 0xf3;  
   netMagic[3] = 0xf4;  
+...
 
-//Part bitcore-lib  
-//**please change the networkMagic's value to 0xf4e5f3f4**
+> Part bitcore-lib  
+**please change the networkMagic's value to 0xf4e5f3f4**
 ```
 cd ~/bitcore-node/node_modules/bitcore-lib/lib  
 vi networks.js 
-
+...  
 var TESTNET = {
   PORT: 18333,
   NETWORK_MAGIC: BufferUtil.integerAsBuffer(0xf4e5f3f4),
@@ -249,50 +257,55 @@ var TESTNET = {
     'testnet-seed.bitcoin.schildbach.de'
   ]
 };
+...
 ```
 
-//BitcoinABC regtestnet part     https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
-//Please find the netMagic class CMainParams  
+> **BitcoinABC regtestnet part**       
+https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp  
+Please find the netMagic class CMainParams  
+...  
   netMagic[0] = 0xda;  
   netMagic[1] = 0xb5;  
   netMagic[2] = 0xbf;  
   netMagic[3] = 0xfa;  
+...
 
-//Part bitcore-lib  
-//**please change the networkMagic's value to 0xdab5bffa**
+>Part bitcore-lib  
+**please change the networkMagic's value to 0xdab5bffa**
 ```
 cd ~/bitcore-node/node_modules/bitcore-lib/lib  
 vi networks.js 
-
+...
 var REGTEST = {
   PORT: 18444,
   NETWORK_MAGIC: BufferUtil.integerAsBuffer(0xdab5bffa),
   DNS_SEEDS: []
 };
+...
 ```
 
-Step10(options)
-//Install pm2
+Step10(options)  
+> Install pm2
 ```
 cd ~
 sudo npm install pm2 -g
 ```
-//If the server reboot,pm2 will auto restart.
+> If the server reboot,pm2 will auto restart.
 ```
 pm2 startup
 sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u [user] --hp /home/[user]
 pm2 save
 ```
-//if you install pm2 please choose step7.1 to run the bitcoin-cash server.
+> if you install pm2 please choose step7.1 to run the bitcoin-cash server.
 Step 11.1
 ```
 cd ~/bitcore-node
 pm2 start ./bin/bitcore-node -- start
 ```
-//if you didin't install pm2,please choose step7.2 to run the bitcoin-cash server.
+> if you didin't install pm2,please choose step7.2 to run the bitcoin-cash server.
 Step11.2
 ```
 cd ~/bitcore-node
 ./bin/bitcore-node start
 ```
-//////Done!!!!///////
+**Done!!!!**
