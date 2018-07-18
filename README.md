@@ -17,7 +17,7 @@ sudo apt-get install bitcoind
 sudo apt-get install libzmq3-dev build-essential
 ```  
 Step3  
-> create bitcoin.conf for bitcoinABC's bitcoind  
+> create bitcoin.conf for bitcoinABC's bitcoind  
 ```
 cd ~ && touch bitcoin.conf
 vi bitcoin.conf
