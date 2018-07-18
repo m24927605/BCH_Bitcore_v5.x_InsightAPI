@@ -43,7 +43,7 @@ daemon=1
 ```
 
 Step4  
-> launch bitcoind and you will see the response "Bitcoin is starting" in terminal then check the debug.log in bch_data folder.
+> launch bitcoind and you will see the response "Bitcoin is starting" in terminal then check the debug.log in bch_data folder.
 ```
 cd ~
 bitcoind -conf=/home/[user]/bitcoin.conf
