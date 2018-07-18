@@ -190,7 +190,7 @@ vi bitcore-node.json
   }
 }
 ```
-**Step9 NOTICE THIS!!!!**  
+**Step9 NOTICE THIS!!!!**  
 > This is very important step to fix the bitcore-node's bug.  
 the bitcore-lib and bitcoinABC's version is not match,it will happen some configure problem like network(p2p).
 
